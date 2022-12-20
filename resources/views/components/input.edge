@@ -1,0 +1,38 @@
+
+<div class="mb-3">
+  <label for="{{ name }}">{{ label }}</label>
+  @if(options)
+    <select
+      name="{{ name }}"
+      id="{{ name }}"
+      class="form-control {{ flashMessages.has(`errors.${name}`) ? 'is-invalid' : '' }}"
+    >
+      @each(key in Object.keys(options))
+        <option value="{{ key }}" {{ flashMessages.get(name) || value == key ? 'selected' : ''  }} >
+          {{ options[key] }}
+        </option>
+      @endeach
+    </select>
+  @elseif(type === 'textarea')
+    <textarea
+      id="{{ name }}"
+      class="form-control {{ flashMessages.has(`errors.${name}`) ? 'is-invalid' : '' }}"
+      name="{{ name }}"
+    >{{ flashMessages.get(name) || value || '' }}</textarea>
+  @else
+    <input
+      type="{{ type ? type : 'text' }}"
+      id="{{ name }}"
+      value="{{ flashMessages.get(name) || value || '' }}"
+      name="{{ name }}"
+      class="form-control {{ flashMessages.has(`errors.${name}`) ? 'is-invalid' : '' }}"
+    />
+  @endif
+
+  {{--  ERROR MESSAGE   --}}
+  @if(flashMessages.has(`errors.${name}`))
+    <div class="invalid-feedback">
+      {{ flashMessages.get(`errors.${name}`) }}
+    </div>
+  @endif
+</div>

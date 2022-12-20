@@ -1,0 +1,7 @@
+@layout('layout')
+
+@section('body')
+  <h2>Modifier l'article {{post.title}}</h2>
+  <span class="btn btn-sm btn-info my-3">{{ post.category.name }}</span>
+  @include('blog/form')
+@endsection
