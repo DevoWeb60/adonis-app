@@ -17,6 +17,14 @@
     </div>
   </div>
   @!component('components/input', {
+    name: 'thumbnailFile',
+    type: 'file',
+    label: 'Miniature',
+  })
+  @if(post.thumbnail)
+    <img src="/uploads/{{ post.thumbnail }}" width="200" height="200" style="object-fit: contain" class="img-thumbnail">
+  @endif
+  @!component('components/input', {
     name: 'content',
     type: 'textarea',
     label: 'Contenu',

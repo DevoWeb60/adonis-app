@@ -28,6 +28,10 @@ export default class UpdatePostValidator {
     title: schema.string({ trim: true }, [rules.minLength(5)]),
     content: schema.string({ trim: true }),
     online: schema.boolean.nullableAndOptional(),
+    thumbnailFile: schema.file({
+      size: "2mb",
+      extnames: ["webp", "png", "jpeg", "jpg"],
+    }),
     categoryId: schema.number([
       rules.exists({ column: Category.primaryKey, table: Category.table }),
     ]),

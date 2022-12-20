@@ -20,9 +20,17 @@
 
 import Route from "@ioc:Adonis/Core/Route";
 
+Route.group(() => {
+  Route.get("/article/new", "BlogsController.create").as("posts.create");
+  Route.post("/article/new", "BlogsController.store");
+  Route.get("/article/:id", "BlogsController.show").as("posts.show");
+  Route.post("/article/:id", "BlogsController.update");
+  Route.delete("/article/:id", "BlogsController.destroy");
+}).middleware("auth");
+
 Route.get("/", "BlogsController.index").as("home");
-Route.get("/article/new", "BlogsController.create").as("posts.create");
-Route.post("/article/new", "BlogsController.store");
-Route.get("/article/:id", "BlogsController.show").as("posts.show");
-Route.post("/article/:id", "BlogsController.update");
-Route.delete("/article/:id", "BlogsController.destroy");
+Route.get("/login", "SecurityController.login").as("login");
+Route.post("/login", "SecurityController.authenticate");
+
+Route.get("/contact", "ContactsController.contact").as("contact");
+Route.post("/contact", "ContactsController.store");

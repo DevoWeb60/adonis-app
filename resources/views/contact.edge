@@ -1,0 +1,32 @@
+@layout('layout')
+
+@section('body')
+  <h1>Nous contacter</h1>
+
+  <form action="" method="POST">
+    <div class="row mb-3">
+      <div class="col">
+        @!component('components.input', {
+          'name': 'name',
+          'label': 'Nom',
+          'value': 'John Doe'
+        })
+      </div>
+      <div class="col">
+        @!component('components.input', {
+          'name': 'email',
+          'label': 'Email',
+          'type': 'email',
+          'value': 'john@doe.com'
+        })
+      </div>
+    </div>
+    @!component('components.input', {
+      'name': 'message',
+      'label': 'Message',
+      'value': 'Sujet du message',
+      'type': 'textarea'
+    })
+    <button class="btn btn-primary">Envoyer</button>
+  </form>
+@endsection

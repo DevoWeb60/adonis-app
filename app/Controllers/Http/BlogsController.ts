@@ -3,6 +3,8 @@ import Database from "@ioc:Adonis/Lucid/Database";
 import Category from "App/Models/Category";
 import Post from "App/Models/Post";
 import UpdatePostValidator from "App/Validators/UpdatePostValidator";
+import { string } from "@ioc:Adonis/Core/Helpers";
+import Drive from "@ioc:Adonis/Core/Drive";
 
 export default class BlogsController {
   async index({ view, request }: HttpContextContract) {
@@ -29,12 +31,13 @@ export default class BlogsController {
     return response.redirect().toRoute("home");
   }
 
-  async show({ view, params }: HttpContextContract) {
+  async show({ view, params, bouncer }: HttpContextContract) {
     // const post = await Post.findOrFail(params.id);
     const post = await Post.query()
       .preload("category")
       .where("id", params.id)
       .firstOrFail();
+    await bouncer.authorize("editPost", post);
     const categories = await Category.all();
     return view.render("blog/show", {
       post,
@@ -42,8 +45,14 @@ export default class BlogsController {
     });
   }
 
-  async update({ params, request, response, session }: HttpContextContract) {
-    await this.handleRequest(params, request);
+  async update({
+    params,
+    request,
+    response,
+    session,
+    bouncer,
+  }: HttpContextContract) {
+    await this.handleRequest(params, request, bouncer);
     session.flash({ success: "L'article a bien été mis à jour." });
     return response.redirect().toRoute("home");
   }
@@ -57,10 +66,31 @@ export default class BlogsController {
 
   private async handleRequest(
     params: HttpContextContract["params"],
-    request: HttpContextContract["request"]
+    request: HttpContextContract["request"],
+    bouncer?: HttpContextContract["bouncer"]
   ) {
     const post = params.id ? await Post.findOrFail(params.id) : new Post();
+
+    if (post.id && bouncer) {
+      await bouncer.authorize("editPost", post);
+    }
     const data = await request.validate(UpdatePostValidator);
-    post.merge({ ...data, online: data.online || false }).save();
+    const thumbnail = request.file("thumbnailFile");
+    if (thumbnail) {
+      if (post.thumbnail) {
+        await Drive.delete(post.thumbnail);
+      }
+      const newName = string.generateRandom(32) + "." + thumbnail.extname;
+      await thumbnail.moveToDisk("./", { name: newName });
+      post.thumbnail = newName;
+    }
+    post
+      .merge({
+        title: data.title,
+        categoryId: data.categoryId,
+        content: data.content,
+        online: data.online || false,
+      })
+      .save();
   }
 }
